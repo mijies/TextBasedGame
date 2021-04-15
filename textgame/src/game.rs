@@ -57,7 +57,7 @@ fn get_item(game: &mut Game, arg: &str) -> Result<(), GameError> {
             game.items.push((game.room, item));
             game.message_item();
 
-            if game.items.len() == Room::ITEM_LENGTH {
+            if game.items.len() == Room::item_count() {
                 return Err(GameError::Over);
             }
             return Ok(())
@@ -87,7 +87,7 @@ impl Game {
 
     pub fn message_start(&self) {
         println!("Historical Math & Physics Text Game");
-        println!("Collect { } items to win the game, or be captured by Laplace's demon.", Room::ITEM_LENGTH);
+        println!("Collect { } items to win the game, or be captured by Laplace's demon.", Room::item_count());
         println!("");
         println!("Move commands: go South, go North, go East, go West");
         println!("Add to Inventory: get 'item name'");
@@ -120,7 +120,7 @@ impl Game {
     }
 
     pub fn win_or_loss(&self) {
-        if self.items.len() == Room::ITEM_LENGTH {
+        if self.items.len() == Room::item_count() {
             println!("");
             println!("Congratulations! You have collected all items!");
         } else {

@@ -1,11 +1,16 @@
 [package]
-name = "textgame"
+name = "textgame_macro"
 version = "0.1.0"
 authors = ["mijies <seiji3030@protonmail.com>"]
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[lib]
+name = "textgame_macro"
+proc-macro = true
+
 [dependencies]
-regex = "1"
-textgame_macro = { path = "../textgame_macro" }
+quote = "1.0"
+syn = "1.0.60"
+

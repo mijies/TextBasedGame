@@ -1,6 +1,7 @@
 use crate::error::GameError;
+use textgame_macro::EnumVariantCount;
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, EnumVariantCount)]
 pub enum Room {
     PointAtInfinity,
     Euclid,
@@ -31,8 +32,9 @@ impl Direction {
 }
 
 impl Room {
-    const ROOM_LENGTH: usize = 5;
-    pub const ITEM_LENGTH: usize = Room::ROOM_LENGTH - 2;
+    pub fn item_count() -> usize {
+        Room::variant_count() - 2
+    }
 
     pub fn name(&self) -> &str {
         match self {
