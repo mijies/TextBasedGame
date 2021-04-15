@@ -33,7 +33,8 @@ fn read_line() -> String {
 fn run_cmd(game: &mut Game, cmd: &str, arg: &str) -> Result<(), GameError> {
     match cmd {
         "go" => go(game, arg),
-        _ => get_item(game, arg),
+        _ => get_item(game, arg)
+            .and_then(|_| count_item(game)),
     }
 }
 
@@ -41,7 +42,6 @@ fn go(game: &mut Game, direction: &str) -> Result<(), GameError> {
     game.room = game.room.go(Direction::new(direction)?)?;
 
     if game.room == Room::LaplaceDemon {
-        game.message_status();
         return Err(GameError::Over)
     }
     Ok(())
@@ -55,15 +55,18 @@ fn get_item(game: &mut Game, arg: &str) -> Result<(), GameError> {
     if let Some(item) = game.room.item() {
         if item == arg {
             game.items.push((game.room, item));
-            game.message_item();
-
-            if game.items.len() == Room::item_count() {
-                return Err(GameError::Over);
-            }
             return Ok(())
         }
     }
     Err(GameError::Item(arg.to_string()))
+}
+
+fn count_item(game: &mut Game) -> Result<(), GameError> {
+    game.message_item();
+    if game.items.len() == Room::item_count() {
+        return Err(GameError::Over);
+    }
+    return Ok(())
 }
 
 fn own_item(game: &mut Game) -> bool {
@@ -77,23 +80,47 @@ fn own_item(game: &mut Game) -> bool {
     false
 }
 
+pub fn message_start() {
+    println!("Historical Math & Physics Text Game");
+    println!("Collect { } items to win the game, or be captured by Laplace's demon.", Room::item_count());
+    println!("");
+    println!("Move commands: go South, go North, go East, go West");
+    println!("Add to Inventory: get 'item name'");
+}
+
 impl Game {
     pub fn new() -> Game {
+        message_start();
         Game {
             room: Room::PointAtInfinity,
             items: ItemList::new(Vec::new()),
         }
     }
 
-    pub fn message_start(&self) {
-        println!("Historical Math & Physics Text Game");
-        println!("Collect { } items to win the game, or be captured by Laplace's demon.", Room::item_count());
-        println!("");
-        println!("Move commands: go South, go North, go East, go West");
-        println!("Add to Inventory: get 'item name'");
+    pub fn run(&mut self) -> &Self {
+        self.message_status();
+
+        if let Err(e) = run_next(self) {
+            if e == GameError::Over {
+                return self
+            }
+            println!("{}", e);
+        }
+        self.run()
     }
 
-    pub fn message_status(&mut self) {
+    pub fn win_or_loss(&self) {
+        if self.items.len() == Room::item_count() {
+            println!("");
+            println!("Congratulations! You have collected all items!");
+        } else {
+            self.message_status();
+            println!("NOM NOM...GAME OVER!");
+        }
+        println!("Thanks for playing the game. Hope you enjoyed it.");
+    }
+
+    fn message_status(&mut self) {
         println!("");
         println!("You are in the {}", self.room.name());
         println!("Inventory : {}", self.items);
@@ -105,26 +132,17 @@ impl Game {
         }
     }
 
-    pub fn message_input(&self) {
+    fn message_input(&self) {
         println!("---------------------------");
         println!("Enter your move:");
     }
 
-    pub fn message_item(&self) {
+    fn message_item(&self) {
         let (_, ref item) = self.items.last().unwrap();
         println!("{} retrieved!", item);
     }
 
-    pub fn message_end(&self) {
-        println!("Thanks for playing the game. Hope you enjoyed it.");
-    }
-
-    pub fn win_or_loss(&self) {
-        if self.items.len() == Room::item_count() {
-            println!("");
-            println!("Congratulations! You have collected all items!");
-        } else {
-            println!("NOM NOM...GAME OVER!");
-        }
-    }
+    // pub fn message_end(&self) {
+    //     println!("Thanks for playing the game. Hope you enjoyed it.");
+    // }
 }

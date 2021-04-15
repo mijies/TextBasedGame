@@ -1,18 +1,7 @@
-use textgame::{Game, GameError, run_next};
+use textgame::Game;
 
 fn main() {
-    let mut game = Game::new();
-    game.message_start();
-
-    loop {
-        game.message_status();
-
-        if let Err(e) = run_next(&mut game) {
-            if e == GameError::Over {
-                break game.win_or_loss();
-            }
-            println!("{}", e);
-        }
-    }
-    game.message_end();
+    Game::new()
+    .run()
+    .win_or_loss();
 }
