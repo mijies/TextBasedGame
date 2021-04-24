@@ -1,17 +1,18 @@
 use crate::room::{Room, Direction};
-use crate::item::ItemList;
+use crate::item::{Item, ItemList};
 use crate::error::GameError;
+use crate::message::*;
 use regex::Regex;
 use std::io;
+use textgame_macro::decorate;
 
 pub struct Game {
     room: Room,
     items: ItemList,
 }
 
+#[decorate(message_input)]
 pub fn run_next(game: &mut Game) -> Result<(), GameError> {
-    game.message_input();
-
     if let Some(caps) = Regex::new(r"(go|get) (.+)")
         .unwrap().captures(&read_line()) {
 
@@ -48,7 +49,7 @@ fn go(game: &mut Game, direction: &str) -> Result<(), GameError> {
 }
 
 fn get_item(game: &mut Game, arg: &str) -> Result<(), GameError> {
-    if own_item(game) {
+    if game.items.contains(&(game.room, arg)) {
         return Err(GameError::Item(arg.to_string()))
     }
 
@@ -61,43 +62,24 @@ fn get_item(game: &mut Game, arg: &str) -> Result<(), GameError> {
     Err(GameError::Item(arg.to_string()))
 }
 
+#[decorate(message_item)]
 fn count_item(game: &mut Game) -> Result<(), GameError> {
-    game.message_item();
     if game.items.len() == Room::item_count() {
         return Err(GameError::Over);
     }
     return Ok(())
 }
 
-fn own_item(game: &mut Game) -> bool {
-    let mut items = game.items.iter();
-
-    while let Some((room, _)) = items.next() {
-        if room == &game.room {
-            return true
-        }
-    }
-    false
-}
-
-pub fn message_start() {
-    println!("Historical Math & Physics Text Game");
-    println!("Collect { } items to win the game, or be captured by Laplace's demon.", Room::item_count());
-    println!("");
-    println!("Move commands: go South, go North, go East, go West");
-    println!("Add to Inventory: get 'item name'");
-}
-
 impl Game {
+    #[decorate(message_start)]
     pub fn new() -> Game {
-        message_start();
         Game {
             room: Room::PointAtInfinity,
             items: ItemList::new(Vec::new()),
         }
     }
 
-    pub fn run(&mut self) -> &Self {
+    pub fn run(&mut self) -> &mut Self {
         self.message_status();
 
         if let Err(e) = run_next(self) {
@@ -109,7 +91,7 @@ impl Game {
         self.run()
     }
 
-    pub fn win_or_loss(&self) {
+    pub fn win_or_loss(&mut self) {
         if self.items.len() == Room::item_count() {
             println!("");
             println!("Congratulations! You have collected all items!");
@@ -120,29 +102,20 @@ impl Game {
         println!("Thanks for playing the game. Hope you enjoyed it.");
     }
 
+    pub fn last_item(&self) -> Item {
+        let (_, ref item) = self.items.last().unwrap();
+        item
+    }
+
     fn message_status(&mut self) {
         println!("");
         println!("You are in the {}", self.room.name());
         println!("Inventory : {}", self.items);
 
         if let Some(item) = self.room.item() {
-            if !own_item(self) {
+            if !self.items.contains(&(self.room, item)) {
                 println!("You see {}", item);
             }
         }
     }
-
-    fn message_input(&self) {
-        println!("---------------------------");
-        println!("Enter your move:");
-    }
-
-    fn message_item(&self) {
-        let (_, ref item) = self.items.last().unwrap();
-        println!("{} retrieved!", item);
-    }
-
-    // pub fn message_end(&self) {
-    //     println!("Thanks for playing the game. Hope you enjoyed it.");
-    // }
 }

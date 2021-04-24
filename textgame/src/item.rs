@@ -2,7 +2,7 @@ use crate::room::Room;
 use std::ops::{Deref, DerefMut};
 use std::fmt;
 
-type Item = &'static str;
+pub type Item = &'static str;
 pub struct ItemList(Vec<(Room, Item)>);
 
 impl ItemList {
