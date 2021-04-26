@@ -21,11 +21,10 @@ pub fn message_input<F>(f: F, game: &mut Game) -> Result<(), GameError>
     f(game)
 }
 
-pub fn message_item<F>(f: F, game: &mut Game) -> Result<(), GameError>
-    where F: Fn(&mut Game) -> Result<(), GameError>
+pub fn message_item<F>(f: F, game: &mut Game, arg: &str) -> Result<(), GameError>
+    where F: Fn(&mut Game, &str) -> Result<(), GameError>
 {
-    // let (_, ref item) = game.items.last().unwrap();
-    // let (_, ref item) = game.last_item().unwrap();
+    f(game, arg)?;
     println!("{} retrieved!", game.last_item());
-    f(game)
+    Ok(())
 }
