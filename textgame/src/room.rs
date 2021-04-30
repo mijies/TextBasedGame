@@ -1,7 +1,7 @@
 use crate::error::GameError;
 use textgame_macro::EnumVariantCount;
 
-#[derive(Clone, Copy, PartialEq, EnumVariantCount)]
+#[derive(Clone, Copy, Debug, PartialEq, EnumVariantCount)]
 pub enum Room {
     PointAtInfinity,
     Euclid,
