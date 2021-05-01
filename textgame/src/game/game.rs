@@ -1,10 +1,10 @@
 use crate::room::{Room, Direction};
 use crate::item::{Item, ItemList};
 use crate::error::GameError;
-use crate::message::*;
 use regex::Regex;
 use std::io;
 use textgame_macro::decorate;
+use super::message::*;
 
 pub struct Game {
     room: Room,
@@ -12,7 +12,7 @@ pub struct Game {
 }
 
 #[decorate(message_input)]
-pub fn run_next(game: &mut Game) -> Result<(), GameError> {
+fn run_next(game: &mut Game) -> Result<(), GameError> {
     if let Some(caps) = Regex::new(r"(go|get) (.+)")
         .unwrap().captures(&read_line()) {
 

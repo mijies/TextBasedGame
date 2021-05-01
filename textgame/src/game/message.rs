@@ -1,6 +1,6 @@
-use crate::game::Game;
-use crate::room::Room;
 use crate::error::GameError;
+use crate::room::Room;
+use super::game::Game;
 
 pub fn message_start<F>(f: F) -> Game
     where F: Fn() -> Game
