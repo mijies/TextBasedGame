@@ -14,7 +14,7 @@ pub struct Game {
 #[decorate(message_input)]
 fn run_next(game: &mut Game) -> Result<(), GameError> {
     if let Some(caps) = Regex::new(r"(go|get) (.+)")
-        .unwrap().captures(&read_line()) {
+        .unwrap().captures(&read_line(io::stdin().lock())) {
 
         return run_cmd(
             game,
@@ -25,9 +25,11 @@ fn run_next(game: &mut Game) -> Result<(), GameError> {
     Err(GameError::Input)
 }
 
-fn read_line() -> String {
+fn read_line<R>(mut reader: R) -> String
+    where R: io::BufRead,
+{
     let mut s = String::new();
-    io::stdin().read_line(&mut s).unwrap();
+    reader.read_line(&mut s).unwrap();
     s
 }
 

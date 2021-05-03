@@ -19,6 +19,16 @@ macro_rules! items_dummy {
     };
 }
 
+#[test]
+fn read_line_test() {
+    let input = "dummy input";
+    let expected = input.clone();
+
+    assert_eq!(
+        read_line(&input.as_bytes()[..]), // &[u8]
+        expected.to_string()
+    );
+}
 
 #[test]
 fn check_item_test() -> Result<(), GameError> {

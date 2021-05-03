@@ -1,6 +1,7 @@
 use textgame::Game;
 
 #[test]
-fn testtest() {
-    Game::new();
+#[should_panic]
+fn last_item_test() {
+    // Game::new().last_item();
 }
