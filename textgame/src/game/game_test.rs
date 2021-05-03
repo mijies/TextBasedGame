@@ -31,6 +31,22 @@ fn read_line_test() {
 }
 
 #[test]
+#[should_panic]
+fn last_item_test_empty() {
+    Game::new().last_item();
+}
+
+#[test]
+fn last_item_test() {
+    let game = &mut Game::new();
+    game.items.push((Room::Euler, "first item"));
+    assert_eq!(game.last_item(), "first item");
+
+    game.items.push((Room::Euclid, "second item"));
+    assert_eq!(game.last_item(), "second item");
+}
+
+#[test]
 fn check_item_test() -> Result<(), GameError> {
     let game = &mut Game::new();
     
